@@ -18,7 +18,7 @@ inputs:
   addon_asset_name:
     description: The last part of the name of the add-on asset within the release
     required: true
-  source_asset_name:
+  src_asset_name:
     description: The last part of the name of the source asset within the release
 runs:
   using: 'node16'
