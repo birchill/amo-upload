@@ -113,6 +113,13 @@
   dependencies:
     "@octokit/openapi-types" "^11.2.0"
 
+"@types/follow-redirects@^1.14.1":
+  version "1.14.1"
+  resolved "https://registry.yarnpkg.com/@types/follow-redirects/-/follow-redirects-1.14.1.tgz#c08b173be7517ddc53725d0faf9648d4dc7a9cdb"
+  integrity sha512-THBEFwqsLuU/K62B5JRwab9NW97cFmL4Iy34NTMX0bMycQVzq2q7PKOkhfivIwxdpa/J72RppgC42vCHfwKJ0Q==
+  dependencies:
+    "@types/node" "*"
+
 "@types/jsonwebtoken@8.5.9":
   version "8.5.9"
   resolved "https://registry.yarnpkg.com/@types/jsonwebtoken/-/jsonwebtoken-8.5.9.tgz#2c064ecb0b3128d837d2764aa0b117b0ff6e4586"
@@ -168,6 +175,11 @@ ecdsa-sig-formatter@1.0.11:
   integrity sha512-nagl3RYrbNv6kQkeJIpt6NJZy8twLB/2vtz6yN9Z4vRKHN4/QZJIEbqohALSgwKdnksuY3k5Addp5lg8sVoVcQ==
   dependencies:
     safe-buffer "^5.0.1"
+
+follow-redirects@^1.15.1:
+  version "1.15.1"
+  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.15.1.tgz#0ca6a452306c9b276e4d3127483e29575e207ad5"
+  integrity sha512-yLAMQs+k0b2m7cVxpS1VKJVvoz7SS9Td1zss3XRwXj+ZDH00RJgnuLx7E44wx02kQLrdM3aOOy+FpzS7+8OizA==
 
 form-data@4.0.0:
   version "4.0.0"

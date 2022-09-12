@@ -3,7 +3,7 @@ import * as github from '@actions/github';
 
 import FormData from 'form-data';
 import * as fs from 'fs';
-import * as https from 'https';
+import { https } from 'follow-redirects';
 import jwt from 'jsonwebtoken';
 import * as path from 'path';
 import type { Readable } from 'stream';
