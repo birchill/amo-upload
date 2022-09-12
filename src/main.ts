@@ -295,6 +295,7 @@ function uploadToAmo({
         }
 
         if (res.statusCode !== 200) {
+          console.log(res);
           reject(
             new Error(
               `Got status ${res.statusCode} for https://${AMO_HOST}${path}`
