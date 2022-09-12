@@ -118,6 +118,7 @@ async function main() {
     ) as UploadDetail;
     if (valid) {
       console.log('Upload is valid');
+      break;
     } else if (valid === false && validation) {
       // I have no idea what these validation objects look like.
       // The docs just say, "the validation results JSON blob".

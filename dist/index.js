@@ -16795,6 +16795,7 @@ function main() {
             const { valid, validation } = JSON.parse(yield getFromAmo(`/api/v5/addons/upload/${uuid}`));
             if (valid) {
                 console.log('Upload is valid');
+                break;
             }
             else if (valid === false && validation) {
                 // I have no idea what these validation objects look like.
