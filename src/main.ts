@@ -250,7 +250,6 @@ async function postToAmo({
     headers: {
       Authorization: `JWT ${getJwtToken()}`,
       'Content-Type': 'application/json',
-      'Content-Length': jsonData.length,
     },
   };
   const url = `https://${options.hostname}${options.path}`;
