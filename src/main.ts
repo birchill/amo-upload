@@ -100,31 +100,35 @@ async function main() {
   // Query the upload details API until it is valid
   //
   // Set an overall timeout of 10 minutes first, however.
-  setTimeout(() => {
+  const tenMinuteTimeout = setTimeout(() => {
     core.setFailed('Timed out waiting for upload to be valid');
     process.exit(1);
   }, 10 * 60 * 1000);
 
-  let valid = initiallyValid;
-  while (!valid) {
-    // Recommended polling interval is 5~10 seconds according to:
-    // https://blog.mozilla.org/addons/2022/03/17/new-api-for-submitting-and-updating-add-ons/
-    console.log('Waiting before checking if upload is valid');
-    await new Promise((resolve) => setTimeout(resolve, 5000));
+  try {
+    let valid = initiallyValid;
+    while (!valid) {
+      // Recommended polling interval is 5~10 seconds according to:
+      // https://blog.mozilla.org/addons/2022/03/17/new-api-for-submitting-and-updating-add-ons/
+      console.log('Waiting before checking if upload is valid');
+      await new Promise((resolve) => setTimeout(resolve, 5000));
 
-    console.log('Checking upload status...');
-    const { valid, validation } = JSON.parse(
-      await getFromAmo(`/api/v5/addons/upload/${uuid}`)
-    ) as UploadDetail;
-    if (valid) {
-      console.log('Upload is valid');
-      break;
-    } else if (valid === false && validation) {
-      // I have no idea what these validation objects look like.
-      // The docs just say, "the validation results JSON blob".
-      throw new Error(`Validation error: ${JSON.stringify(validation)}`);
+      console.log('Checking upload status...');
+      const { valid, validation } = JSON.parse(
+        await getFromAmo(`/api/v5/addons/upload/${uuid}`)
+      ) as UploadDetail;
+      if (valid) {
+        console.log('Upload is valid');
+        break;
+      } else if (valid === false && validation) {
+        // I have no idea what these validation objects look like.
+        // The docs just say, "the validation results JSON blob".
+        throw new Error(`Validation error: ${JSON.stringify(validation)}`);
+      }
+      console.log('Upload is still not valid');
     }
-    console.log('Upload is still not valid');
+  } finally {
+    clearTimeout(tenMinuteTimeout);
   }
 
   // Create a new version with the provided release notes
