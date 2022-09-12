@@ -16865,7 +16865,7 @@ const AMO_HOST = 'addons.mozilla.org';
 function getFromAmo(path) {
     return new Promise((resolve, reject) => {
         const url = `https://${AMO_HOST}${path}`;
-        follow_redirects.https.get(url, { auth: `JWT ${getJwtToken()}` }, (res) => {
+        follow_redirects.https.get(url, { headers: { Authorization: `JWT ${getJwtToken()}` } }, (res) => {
             if (res.statusCode !== 200) {
                 reject(new Error(`Got status ${res.statusCode} for ${url}`));
             }
@@ -16891,10 +16891,10 @@ function postToAmo({ path, jsonData, }) {
             path,
             method: 'POST',
             headers: {
+                Authorization: `JWT ${getJwtToken()}`,
                 'Content-Type': 'application/json',
                 'Content-Length': jsonData.length,
             },
-            auth: `JWT ${getJwtToken()}`,
         };
         const url = `https://${options.hostname}${options.path}`;
         return new Promise((resolve, reject) => {
@@ -16925,7 +16925,9 @@ function uploadToAmo({ path, formData, method = 'POST', }) {
             method,
             path,
             protocol: 'https:',
-            auth: `JWT ${getJwtToken()}`,
+            headers: {
+                Authorization: `JWT ${getJwtToken()}`,
+            },
         }, (err, res) => {
             if (err) {
                 reject(err);

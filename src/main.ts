@@ -208,19 +208,23 @@ function getFromAmo(path: string): Promise<string> {
   return new Promise((resolve, reject) => {
     const url = `https://${AMO_HOST}${path}`;
     https
-      .get(url, { auth: `JWT ${getJwtToken()}` }, (res) => {
-        if (res.statusCode !== 200) {
-          reject(new Error(`Got status ${res.statusCode} for ${url}`));
-        } else {
-          let body = '';
-          res.on('data', (chunk) => {
-            body += chunk;
-          });
-          res.on('end', () => {
-            resolve(body);
-          });
+      .get(
+        url,
+        { headers: { Authorization: `JWT ${getJwtToken()}` } },
+        (res) => {
+          if (res.statusCode !== 200) {
+            reject(new Error(`Got status ${res.statusCode} for ${url}`));
+          } else {
+            let body = '';
+            res.on('data', (chunk) => {
+              body += chunk;
+            });
+            res.on('end', () => {
+              resolve(body);
+            });
+          }
         }
-      })
+      )
       .on('error', (err) => {
         reject(err);
       });
@@ -239,10 +243,10 @@ async function postToAmo({
     path,
     method: 'POST',
     headers: {
+      Authorization: `JWT ${getJwtToken()}`,
       'Content-Type': 'application/json',
       'Content-Length': jsonData.length,
     },
-    auth: `JWT ${getJwtToken()}`,
   };
   const url = `https://${options.hostname}${options.path}`;
 
@@ -286,7 +290,9 @@ function uploadToAmo({
         method,
         path,
         protocol: 'https:',
-        auth: `JWT ${getJwtToken()}`,
+        headers: {
+          Authorization: `JWT ${getJwtToken()}`,
+        },
       },
       (err, res) => {
         if (err) {
