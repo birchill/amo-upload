@@ -16849,7 +16849,7 @@ main().catch((error) => {
 function getHttpsStream(url) {
     return new Promise((resolve, reject) => {
         follow_redirects.https.get(url, (res) => {
-            if (res.statusCode !== 200) {
+            if (!res.statusCode || res.statusCode < 200 || res.statusCode >= 300) {
                 reject(new Error(`Got status ${res.statusCode} for ${url}`));
             }
             else {
@@ -16866,7 +16866,9 @@ function getFromAmo(path) {
     return new Promise((resolve, reject) => {
         const url = `https://${AMO_HOST}${path}`;
         follow_redirects.https.get(url, { headers: { Authorization: `JWT ${getJwtToken()}` } }, (res) => {
-            if (res.statusCode !== 200) {
+            if (!res.statusCode ||
+                res.statusCode < 200 ||
+                res.statusCode >= 300) {
                 reject(new Error(`Got status ${res.statusCode} for ${url}`));
             }
             else {
@@ -16899,7 +16901,7 @@ function postToAmo({ path, jsonData, }) {
         const url = `https://${options.hostname}${options.path}`;
         return new Promise((resolve, reject) => {
             const req = follow_redirects.https.request(options, (res) => {
-                if (res.statusCode !== 200) {
+                if (!res.statusCode || res.statusCode < 200 || res.statusCode >= 300) {
                     reject(new Error(`Got status ${res.statusCode} for ${url}`));
                 }
                 let response = '';
@@ -16933,8 +16935,7 @@ function uploadToAmo({ path, formData, method = 'POST', }) {
                 reject(err);
                 return;
             }
-            if (res.statusCode !== 200) {
-                console.log(res);
+            if (!res.statusCode || res.statusCode < 200 || res.statusCode >= 300) {
                 reject(new Error(`Got status ${res.statusCode} for https://${AMO_HOST}${path}`));
             }
             else {

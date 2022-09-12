@@ -190,7 +190,7 @@ function getHttpsStream(url: string): Promise<Readable> {
   return new Promise((resolve, reject) => {
     https
       .get(url, (res) => {
-        if (res.statusCode !== 200) {
+        if (!res.statusCode || res.statusCode < 200 || res.statusCode >= 300) {
           reject(new Error(`Got status ${res.statusCode} for ${url}`));
         } else {
           resolve(res);
@@ -212,7 +212,11 @@ function getFromAmo(path: string): Promise<string> {
         url,
         { headers: { Authorization: `JWT ${getJwtToken()}` } },
         (res) => {
-          if (res.statusCode !== 200) {
+          if (
+            !res.statusCode ||
+            res.statusCode < 200 ||
+            res.statusCode >= 300
+          ) {
             reject(new Error(`Got status ${res.statusCode} for ${url}`));
           } else {
             let body = '';
@@ -252,7 +256,7 @@ async function postToAmo({
 
   return new Promise((resolve, reject) => {
     const req = https.request(options, (res) => {
-      if (res.statusCode !== 200) {
+      if (!res.statusCode || res.statusCode < 200 || res.statusCode >= 300) {
         reject(new Error(`Got status ${res.statusCode} for ${url}`));
       }
 
@@ -300,8 +304,7 @@ function uploadToAmo({
           return;
         }
 
-        if (res.statusCode !== 200) {
-          console.log(res);
+        if (!res.statusCode || res.statusCode < 200 || res.statusCode >= 300) {
           reject(
             new Error(
               `Got status ${res.statusCode} for https://${AMO_HOST}${path}`
