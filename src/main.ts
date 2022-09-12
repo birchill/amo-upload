@@ -192,7 +192,7 @@ function getHttpsStream(url: string): Promise<Readable> {
     https
       .get(url, (res) => {
         if (!res.statusCode || res.statusCode < 200 || res.statusCode >= 300) {
-          reject(new Error(`Got status ${res.statusCode} for ${url}`));
+          reject(new Error(`Got status ${res.statusCode} for GET ${url}`));
         } else {
           resolve(res);
         }
@@ -218,7 +218,7 @@ function getFromAmo(path: string): Promise<string> {
             res.statusCode < 200 ||
             res.statusCode >= 300
           ) {
-            reject(new Error(`Got status ${res.statusCode} for ${url}`));
+            reject(new Error(`Got status ${res.statusCode} for GET ${url}`));
           } else {
             let body = '';
             res.on('data', (chunk) => {
@@ -254,11 +254,13 @@ async function postToAmo({
     },
   };
   const url = `https://${options.hostname}${options.path}`;
+  console.log(`Posting: ${jsonData}`);
 
   return new Promise((resolve, reject) => {
     const req = https.request(options, (res) => {
       if (!res.statusCode || res.statusCode < 200 || res.statusCode >= 300) {
-        reject(new Error(`Got status ${res.statusCode} for ${url}`));
+        console.log(res);
+        reject(new Error(`Got status ${res.statusCode} for POST ${url}`));
       }
 
       let response = '';
@@ -308,7 +310,7 @@ function uploadToAmo({
         if (!res.statusCode || res.statusCode < 200 || res.statusCode >= 300) {
           reject(
             new Error(
-              `Got status ${res.statusCode} for https://${AMO_HOST}${path}`
+              `Got status ${res.statusCode} for POST https://${AMO_HOST}${path}`
             )
           );
         } else {

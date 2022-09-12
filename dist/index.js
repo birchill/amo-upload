@@ -16851,7 +16851,7 @@ function getHttpsStream(url) {
     return new Promise((resolve, reject) => {
         follow_redirects.https.get(url, (res) => {
             if (!res.statusCode || res.statusCode < 200 || res.statusCode >= 300) {
-                reject(new Error(`Got status ${res.statusCode} for ${url}`));
+                reject(new Error(`Got status ${res.statusCode} for GET ${url}`));
             }
             else {
                 resolve(res);
@@ -16870,7 +16870,7 @@ function getFromAmo(path) {
             if (!res.statusCode ||
                 res.statusCode < 200 ||
                 res.statusCode >= 300) {
-                reject(new Error(`Got status ${res.statusCode} for ${url}`));
+                reject(new Error(`Got status ${res.statusCode} for GET ${url}`));
             }
             else {
                 let body = '';
@@ -16900,10 +16900,12 @@ function postToAmo({ path, jsonData, }) {
             },
         };
         const url = `https://${options.hostname}${options.path}`;
+        console.log(`Posting: ${jsonData}`);
         return new Promise((resolve, reject) => {
             const req = follow_redirects.https.request(options, (res) => {
                 if (!res.statusCode || res.statusCode < 200 || res.statusCode >= 300) {
-                    reject(new Error(`Got status ${res.statusCode} for ${url}`));
+                    console.log(res);
+                    reject(new Error(`Got status ${res.statusCode} for POST ${url}`));
                 }
                 let response = '';
                 res.on('data', (chunk) => {
@@ -16937,7 +16939,7 @@ function uploadToAmo({ path, formData, method = 'POST', }) {
                 return;
             }
             if (!res.statusCode || res.statusCode < 200 || res.statusCode >= 300) {
-                reject(new Error(`Got status ${res.statusCode} for https://${AMO_HOST}${path}`));
+                reject(new Error(`Got status ${res.statusCode} for POST https://${AMO_HOST}${path}`));
             }
             else {
                 let body = '';
