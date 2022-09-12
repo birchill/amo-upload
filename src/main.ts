@@ -8,6 +8,7 @@ import jwt from 'jsonwebtoken';
 import * as path from 'path';
 import type { Readable } from 'stream';
 import { pipeline } from 'stream/promises';
+import utf8 from 'utf8';
 
 type UploadDetail = {
   uuid: string;
@@ -254,6 +255,7 @@ async function postToAmo({
     headers: {
       Authorization: `JWT ${getJwtToken()}`,
       'Content-Type': 'application/json',
+      'Content-Length': utf8.encode(jsonData).length,
     },
   };
   const url = `https://${options.hostname}${options.path}`;
