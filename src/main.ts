@@ -254,20 +254,19 @@ async function postToAmo({
     },
   };
   const url = `https://${options.hostname}${options.path}`;
-  console.log(`Posting: ${jsonData}`);
 
   return new Promise((resolve, reject) => {
     const req = https.request(options, (res) => {
-      if (!res.statusCode || res.statusCode < 200 || res.statusCode >= 300) {
-        console.log(res);
-        reject(new Error(`Got status ${res.statusCode} for POST ${url}`));
-      }
-
       let response = '';
       res.on('data', (chunk) => {
         response += chunk;
       });
       res.on('end', () => {
+        if (!res.statusCode || res.statusCode < 200 || res.statusCode >= 300) {
+          console.error(response);
+          reject(new Error(`Got status ${res.statusCode} for POST ${url}`));
+        }
+
         resolve(response);
       });
     });
