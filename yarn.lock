@@ -142,10 +142,10 @@
   resolved "https://registry.yarnpkg.com/@types/utf8/-/utf8-3.0.1.tgz#bf081663d4fff05ee63b41f377a35f8b189f7e5b"
   integrity sha512-1EkWuw7rT3BMz2HpmcEOr/HL61mWNA6Ulr/KdbXR9AI0A55wD4Qfv8hizd8Q1DnknSIzzDvQmvvY/guvX7jjZA==
 
-"@vercel/ncc@0.34.0":
-  version "0.34.0"
-  resolved "https://registry.yarnpkg.com/@vercel/ncc/-/ncc-0.34.0.tgz#d0139528320e46670d949c82967044a8f66db054"
-  integrity sha512-G9h5ZLBJ/V57Ou9vz5hI8pda/YQX5HQszCs3AmIus3XzsmRn/0Ptic5otD3xVST8QLKk7AMk7AqpsyQGN7MZ9A==
+"@vercel/ncc@0.36.0":
+  version "0.36.0"
+  resolved "https://registry.yarnpkg.com/@vercel/ncc/-/ncc-0.36.0.tgz#1f262b86fc4f0770bbc0fc1d331d5aaa1bd47334"
+  integrity sha512-/ZTUJ/ZkRt694k7KJNimgmHjtQcRuVwsST2Z6XfYveQIuBbHR+EqkTc1jfgPkQmMyk/vtpxo3nVxe8CNuau86A==
 
 asynckit@^0.4.0:
   version "0.4.0"
