@@ -18,7 +18,7 @@
   "devDependencies": {
     "@types/follow-redirects": "1.14.1",
     "@types/jsonwebtoken": "9.0.0",
-    "@types/node": "18.11.17",
+    "@types/node": "18.11.18",
     "@types/utf8": "3.0.1",
     "@vercel/ncc": "0.36.0",
     "husky": "8.0.2",
