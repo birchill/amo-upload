@@ -132,10 +132,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.23.tgz#3b41a6e643589ac6442bdbd7a4a3ded62f33f7da"
   integrity sha512-UxDxWn7dl97rKVeVS61vErvw086aCYhDLyvRQZ5Rk65rZKepaFdm53GeqXaKBuOhED4e9uWq34IC3TdSdJJ2Gw==
 
-"@types/node@18.17.9":
-  version "18.17.9"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.17.9.tgz#b219fa0da3c574399f4a44455ea4b388029afd56"
-  integrity sha512-fxaKquqYcPOGwE7tC1anJaPJ0GHyOVzfA2oUoXECjBjrtsIz4YJvtNYsq8LUcjEUehEF+jGpx8Z+lFrtT6z0tg==
+"@types/node@18.17.11":
+  version "18.17.11"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.17.11.tgz#c04054659d88bfeba94095f41ef99a8ddf4e1813"
+  integrity sha512-r3hjHPBu+3LzbGBa8DHnr/KAeTEEOrahkcL+cZc4MaBMTM+mk8LtXR+zw+nqfjuDZZzYTYgTcpHuP+BEQk069g==
 
 "@types/utf8@3.0.1":
   version "3.0.1"
