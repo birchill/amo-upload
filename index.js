@@ -1,64 +1,74 @@
+// @ts-check
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 
 import FormData from 'form-data';
-import * as fs from 'fs';
 import { https } from 'follow-redirects';
 import jwt from 'jsonwebtoken';
-import * as path from 'path';
-import type { Readable } from 'stream';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import { pipeline } from 'stream/promises';
 import utf8 from 'utf8';
 
-type UploadDetail = {
-  uuid: string;
-  channel: string;
-  processed: boolean;
-  submitted: boolean;
-  url: string;
-  valid: boolean;
-  validation?: Record<string, unknown>;
-  version: string;
-};
+/**
+ * @typedef {object} UploadDetail
+ * @property {string} uuid
+ * @property {string} channel
+ * @property {boolean} processed
+ * @property {boolean} submitted
+ * @property {string} url
+ * @property {boolean} valid
+ * @property {Record<string, unknown>} [validation]
+ * @property {string} version
+ */
 
-type VersionDetail = {
-  id: number;
-  channel: 'listed' | 'unlisted';
-  compatibility: Record<string, { min?: string; max?: string }>;
-  edit_url: string;
-  file: {
-    id: number;
-    created: string;
-    hash: string;
-    is_mozilla_signed_extension: boolean;
-    optional_permissions: Array<string>;
-    permissions: Array<string>;
-    size: number;
-    status: number;
-    url: string;
-  };
-  license: {
-    is_custom: boolean;
-    name: Record<string, string> | null;
-    text: Record<string, string> | null;
-    url: string | null;
-    slug: string | null;
-  };
-  release_notes: Record<string, string> | null;
-  reviewed?: string;
-  is_strict_compatibility_enabled: boolean;
-  source: string | null;
-  version: string;
-};
+/**
+ * @typedef {object} VersionDetail
+ * @property {number} id
+ * @property {'listed' | 'unlisted'} channel
+ * @property {Record<string, { min?: string; max?: string }>} compatibility
+ * @property {string} edit_url
+ * @property {FileDetail} file
+ * @property {LicenseDetail} license
+ * @property {Record<string, string> | null} release_notes
+ * @property {string} [reviewed]
+ * @property {boolean} is_strict_compatibility_enabled
+ * @property {string | null} source
+ * @property {string} version
+ */
+
+/**
+ * @typedef {object} FileDetail
+ * @property {number} id
+ * @property {string} created
+ * @property {string} hash
+ * @property {boolean} is_mozilla_signed_extension
+ * @property {Array<string>} optional_permissions
+ * @property {Array<string>} permissions
+ * @property {number} size
+ * @property {number} status
+ * @property {string} url
+ */
+
+/**
+ * @typedef {object} LicenseDetail
+ * @property {boolean} is_custom
+ * @property {Record<string, string> | null} name
+ * @property {Record<string, string> | null} text
+ * @property {string | null} url
+ * @property {string | null} slug
+ */
 
 async function main() {
-  const octokit = github.getOctokit(process.env.GITHUB_TOKEN!);
+  const octokit = github.getOctokit(
+    /** @type string */ (process.env.GITHUB_TOKEN)
+  );
   const {
     repo: { owner, repo },
   } = github.context;
 
   const releaseId = parseInt(core.getInput('release_id'), 10);
-  console.log(`Fetching metadata for release ${releaseId}`);
+  core.info(`Fetching metadata for release ${releaseId}`);
   const release = await octokit.rest.repos.getRelease({
     owner,
     repo,
@@ -71,11 +81,12 @@ async function main() {
   if (!addonAsset) {
     throw new Error(`No asset found with name ${addonAssetName}`);
   }
-  console.log(`Found add-on asset: ${addonAsset.name}`);
+  core.info(`Found add-on asset: ${addonAsset.name}`);
 
   // Fetch the asset
-  const assetPath = path.join(process.env.GITHUB_WORKSPACE!, 'addon.zip');
-  console.log(`Downloading ${addonAsset.browser_download_url} to ${assetPath}`);
+  const workspace = /** @type string */ (process.env.GITHUB_WORKSPACE);
+  const assetPath = path.join(workspace, 'addon.zip');
+  core.info(`Downloading ${addonAsset.browser_download_url} to ${assetPath}`);
   await pipeline(
     await getHttpsStream(addonAsset.browser_download_url),
     fs.createWriteStream(assetPath)
@@ -89,44 +100,45 @@ async function main() {
     path: '/api/v5/addons/upload/',
     formData,
   });
-  const {
-    uuid,
-    version,
-    valid: initiallyValid,
-  } = JSON.parse(uploadResponse) as UploadDetail;
-  console.log(
+  /** @type UploadDetail */
+  const { uuid, version, valid: initiallyValid } = JSON.parse(uploadResponse);
+  core.info(
     `Successfully uploaded add-on for version ${version} with uuid ${uuid}`
   );
 
   // Query the upload details API until it is valid
   //
   // Set an overall timeout of 10 minutes first, however.
-  const tenMinuteTimeout = setTimeout(() => {
-    core.setFailed('Timed out waiting for upload to be valid');
-    process.exit(1);
-  }, 10 * 60 * 1000);
+  const tenMinuteTimeout = setTimeout(
+    () => {
+      core.setFailed('Timed out waiting for upload to be valid');
+      process.exit(1);
+    },
+    10 * 60 * 1000
+  );
 
   try {
     let valid = initiallyValid;
     while (!valid) {
       // Recommended polling interval is 5~10 seconds according to:
       // https://blog.mozilla.org/addons/2022/03/17/new-api-for-submitting-and-updating-add-ons/
-      console.log('Waiting before checking if upload is valid');
+      core.info('Waiting before checking if upload is valid');
       await new Promise((resolve) => setTimeout(resolve, 5000));
 
-      console.log('Checking upload status...');
+      core.info('Checking upload status...');
+      /** @type UploadDetail */
       const { valid, validation } = JSON.parse(
         await getFromAmo(`/api/v5/addons/upload/${uuid}`)
-      ) as UploadDetail;
+      );
       if (valid) {
-        console.log('Upload is valid');
+        core.info('Upload is valid');
         break;
       } else if (valid === false && validation) {
         // I have no idea what these validation objects look like.
         // The docs just say, "the validation results JSON blob".
         throw new Error(`Validation error: ${JSON.stringify(validation)}`);
       }
-      console.log('Upload is still not valid');
+      core.info('Upload is still not valid');
     }
   } finally {
     clearTimeout(tenMinuteTimeout);
@@ -142,15 +154,14 @@ async function main() {
     release_notes: { 'en-US': releaseNotes },
     upload: uuid,
   });
+  /** @type VersionDetail */
   const { id: versionId, version: versionString } = JSON.parse(
     await postToAmo({
       path: `/api/v5/addons/addon/${addonId}/versions/`,
       jsonData: postData,
     })
-  ) as VersionDetail;
-  console.log(
-    `Successfully created version ${versionString} (id: ${versionId})`
   );
+  core.info(`Successfully created version ${versionString} (id: ${versionId})`);
 
   // Get the source asset (if any)
   const srcAssetName = core.getInput('src_asset_name');
@@ -159,14 +170,11 @@ async function main() {
     if (!srcAsset) {
       throw new Error(`No asset found with name ${srcAssetName}`);
     }
-    console.log(`Found source asset: ${srcAsset.name}`);
+    core.info(`Found source asset: ${srcAsset.name}`);
 
     // Download the source asset
-    const srcAssetPath = path.join(
-      process.env.GITHUB_WORKSPACE!,
-      'addon-src.zip'
-    );
-    console.log(
+    const srcAssetPath = path.join(workspace, 'addon-src.zip');
+    core.info(
       `Downloading ${srcAsset.browser_download_url} to ${srcAssetPath}`
     );
     await pipeline(
@@ -182,17 +190,21 @@ async function main() {
       formData: form,
       method: 'PATCH',
     });
-    console.log('Successfully uploaded source asset');
+    core.info('Successfully uploaded source asset');
   }
 
-  console.log('Publishing complete.');
+  core.info('Publishing complete.');
 }
 
 main().catch((error) => {
   core.setFailed(error.message);
 });
 
-function getHttpsStream(url: string): Promise<Readable> {
+/**
+ * @param {string} url
+ * @returns {Promise<import('stream').Readable>}
+ */
+function getHttpsStream(url) {
   return new Promise((resolve, reject) => {
     https
       .get(url, (res) => {
@@ -210,7 +222,11 @@ function getHttpsStream(url: string): Promise<Readable> {
 
 const AMO_HOST = 'addons.mozilla.org';
 
-function getFromAmo(path: string): Promise<string> {
+/**
+ * @param {string} path
+ * @returns {Promise<string>}
+ */
+function getFromAmo(path) {
   return new Promise((resolve, reject) => {
     const url = `https://${AMO_HOST}${path}`;
     https
@@ -241,13 +257,13 @@ function getFromAmo(path: string): Promise<string> {
   });
 }
 
-async function postToAmo({
-  path,
-  jsonData,
-}: {
-  path: string;
-  jsonData: string;
-}): Promise<string> {
+/**
+ * @param {object} options
+ * @param {string} options.path
+ * @param {string} options.jsonData
+ * @returns {Promise<string>}
+ */
+async function postToAmo({ path, jsonData }) {
   const options = {
     hostname: AMO_HOST,
     path,
@@ -268,7 +284,7 @@ async function postToAmo({
       });
       res.on('end', () => {
         if (!res.statusCode || res.statusCode < 200 || res.statusCode >= 300) {
-          console.error(response);
+          core.error(response);
           reject(new Error(`Got status ${res.statusCode} for POST ${url}`));
         }
 
@@ -285,15 +301,14 @@ async function postToAmo({
   });
 }
 
-function uploadToAmo({
-  path,
-  formData,
-  method = 'POST',
-}: {
-  path: string;
-  formData: FormData;
-  method?: string;
-}): Promise<string> {
+/**
+ * @param {object} options
+ * @param {string} options.path
+ * @param {FormData} options.formData
+ * @param {string} [options.method]
+ * @returns {Promise<string>}
+ */
+function uploadToAmo({ path, formData, method = 'POST' }) {
   return new Promise((resolve, reject) => {
     formData.submit(
       {
