@@ -2,16 +2,17 @@
   "compilerOptions": {
     "alwaysStrict": true,
     "checkJs": true,
-    "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "node",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "noEmit": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "noUncheckedIndexedAccess": true,
     "noUnusedLocals": true,
     "pretty": true,
     "strict": true,
-    "target": "es6"
+    "target": "es2020"
   },
-  "exclude": ["node_modules"]
+  "exclude": ["dist", "node_modules"]
 }

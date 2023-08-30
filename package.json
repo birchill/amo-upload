@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "description": "GitHub action to upload a new version of a Firefox Web extension to addons.mozilla.org",
-  "main": "main.js",
+  "main": "dist/index.js",
   "repository": "https://github.com/birchill/amo-upload/",
   "author": "Brian Birtles <birtles@gmail.com>",
   "license": "MIT",
@@ -21,11 +21,17 @@
     "@types/jsonwebtoken": "9.0.2",
     "@types/node": "18.17.12",
     "@types/utf8": "3.0.1",
+    "esbuild": "0.19.2",
+    "husky": "8.0.3",
     "prettier": "3.0.3",
     "typescript": "5.2.2"
   },
   "scripts": {
+    "build": "tsc",
     "format": "prettier --write index.js",
-    "format-check": "prettier --check index.js"
+    "format-check": "prettier --check index.js",
+    "package": "esbuild index.js --outfile=dist/index.js --bundle --platform=node --target=node16",
+    "all": "yarn build && yarn format && yarn package",
+    "postinstall": "husky install"
   }
 }
