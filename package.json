@@ -19,7 +19,7 @@
   "devDependencies": {
     "@types/follow-redirects": "1.14.1",
     "@types/jsonwebtoken": "9.0.2",
-    "@types/node": "18.17.13",
+    "@types/node": "18.17.14",
     "@types/utf8": "3.0.1",
     "esbuild": "0.19.2",
     "husky": "8.0.3",
