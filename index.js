@@ -3,10 +3,10 @@ import * as core from '@actions/core';
 import * as github from '@actions/github';
 
 import FormData from 'form-data';
-import { https } from 'follow-redirects';
 import jwt from 'jsonwebtoken';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import { Readable } from 'stream';
 import { pipeline } from 'stream/promises';
 import utf8 from 'utf8';
 
@@ -202,22 +202,28 @@ main().catch((error) => {
 
 /**
  * @param {string} url
- * @returns {Promise<import('stream').Readable>}
+ * @returns {Promise<Readable>}
  */
-function getHttpsStream(url) {
-  return new Promise((resolve, reject) => {
-    https
-      .get(url, (res) => {
-        if (!res.statusCode || res.statusCode < 200 || res.statusCode >= 300) {
-          reject(new Error(`Got status ${res.statusCode} for GET ${url}`));
-        } else {
-          resolve(res);
-        }
-      })
-      .on('error', (err) => {
-        reject(err);
-      });
-  });
+async function getHttpsStream(url) {
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error(
+      `Got status ${res.status} (${res.statusText}) for GET ${url}`
+    );
+  }
+
+  if (!res.body) {
+    throw new Error('Response has no body');
+  }
+
+  // See:
+  //
+  // https://stackoverflow.com/questions/63630114/argument-of-type-readablestreamany-is-not-assignable-to-parameter-of-type-r
+  // https://stackoverflow.com/questions/73308289/typescript-error-converting-a-native-fetch-body-webstream-to-a-node-stream
+  // for why the cast is necessary
+  return Readable.fromWeb(
+    /** @type import('stream/web').ReadableStream<any> */ (res.body)
+  );
 }
 
 const AMO_HOST = 'addons.mozilla.org';
@@ -226,35 +232,19 @@ const AMO_HOST = 'addons.mozilla.org';
  * @param {string} path
  * @returns {Promise<string>}
  */
-function getFromAmo(path) {
-  return new Promise((resolve, reject) => {
-    const url = `https://${AMO_HOST}${path}`;
-    https
-      .get(
-        url,
-        { headers: { Authorization: `JWT ${getJwtToken()}` } },
-        (res) => {
-          if (
-            !res.statusCode ||
-            res.statusCode < 200 ||
-            res.statusCode >= 300
-          ) {
-            reject(new Error(`Got status ${res.statusCode} for GET ${url}`));
-          } else {
-            let body = '';
-            res.on('data', (chunk) => {
-              body += chunk;
-            });
-            res.on('end', () => {
-              resolve(body);
-            });
-          }
-        }
-      )
-      .on('error', (err) => {
-        reject(err);
-      });
+async function getFromAmo(path) {
+  const url = `https://${AMO_HOST}${path}`;
+  const res = await fetch(url, {
+    headers: { Authorization: `JWT ${getJwtToken()}` },
   });
+
+  if (!res.ok) {
+    throw new Error(
+      `Got status ${res.status} (${res.statusText}) for GET ${url}`
+    );
+  }
+
+  return res.text();
 }
 
 /**
@@ -264,41 +254,18 @@ function getFromAmo(path) {
  * @returns {Promise<string>}
  */
 async function postToAmo({ path, jsonData }) {
-  const options = {
-    hostname: AMO_HOST,
-    path,
+  const url = `https://${AMO_HOST}${path}`;
+  const res = await fetch(url, {
     method: 'POST',
     headers: {
       Authorization: `JWT ${getJwtToken()}`,
       'Content-Type': 'application/json',
-      'Content-Length': utf8.encode(jsonData).length,
+      'Content-Length': String(utf8.encode(jsonData).length),
     },
-  };
-  const url = `https://${options.hostname}${options.path}`;
-
-  return new Promise((resolve, reject) => {
-    const req = https.request(options, (res) => {
-      let response = '';
-      res.on('data', (chunk) => {
-        response += chunk;
-      });
-      res.on('end', () => {
-        if (!res.statusCode || res.statusCode < 200 || res.statusCode >= 300) {
-          core.error(response);
-          reject(new Error(`Got status ${res.statusCode} for POST ${url}`));
-        }
-
-        resolve(response);
-      });
-    });
-
-    req.on('error', (e) => {
-      reject(e);
-    });
-
-    req.write(jsonData);
-    req.end();
+    body: jsonData,
   });
+
+  return res.text();
 }
 
 /**
