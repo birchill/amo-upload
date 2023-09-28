@@ -19,7 +19,7 @@
     "@types/jsonwebtoken": "9.0.3",
     "@types/node": "20.7.1",
     "@types/utf8": "3.0.1",
-    "esbuild": "0.19.3",
+    "esbuild": "0.19.4",
     "husky": "8.0.3",
     "prettier": "3.0.3",
     "typescript": "5.2.2"
