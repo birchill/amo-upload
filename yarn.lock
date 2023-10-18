@@ -251,10 +251,10 @@
   dependencies:
     undici-types "~5.25.1"
 
-"@types/utf8@3.0.1":
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/@types/utf8/-/utf8-3.0.1.tgz#bf081663d4fff05ee63b41f377a35f8b189f7e5b"
-  integrity sha512-1EkWuw7rT3BMz2HpmcEOr/HL61mWNA6Ulr/KdbXR9AI0A55wD4Qfv8hizd8Q1DnknSIzzDvQmvvY/guvX7jjZA==
+"@types/utf8@3.0.2":
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/@types/utf8/-/utf8-3.0.2.tgz#98139a5cff54b23f610f24f88fbd8e1eed839c09"
+  integrity sha512-yT2dyNcirLj+qwYekmH1F0lQtXoT7HyV6tVFYh0Ay4miNaujL2BnL3P3Pn1N+SMuLqkGk8BR1h8OkxbpFw0ysg==
 
 asynckit@^0.4.0:
   version "0.4.0"
