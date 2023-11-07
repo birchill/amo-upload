@@ -146,10 +146,10 @@
   dependencies:
     undici-types "~5.26.4"
 
-"@types/utf8@3.0.2":
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/@types/utf8/-/utf8-3.0.2.tgz#98139a5cff54b23f610f24f88fbd8e1eed839c09"
-  integrity sha512-yT2dyNcirLj+qwYekmH1F0lQtXoT7HyV6tVFYh0Ay4miNaujL2BnL3P3Pn1N+SMuLqkGk8BR1h8OkxbpFw0ysg==
+"@types/utf8@3.0.3":
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/@types/utf8/-/utf8-3.0.3.tgz#e153ada15157477a9e0d2bcc638c34284a1d82ea"
+  integrity sha512-+lqLGxWZsEe4Z6OrzBI7Ym4SMUTaMS5yOrHZ0/IL0bpIye1Qbs4PpobJL2mLDbftUXlPFZR7fu6d1yM+bHLX1w==
 
 asynckit@^0.4.0:
   version "0.4.0"
