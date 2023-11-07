@@ -1,13 +1,10 @@
 // @ts-check
 import * as core from '@actions/core';
-import * as github from '@actions/github';
 
 import FormData from 'form-data';
 import jwt from 'jsonwebtoken';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { Readable } from 'stream';
-import { pipeline } from 'stream/promises';
 import utf8 from 'utf8';
 
 /**
@@ -60,41 +57,27 @@ import utf8 from 'utf8';
  */
 
 async function main() {
-  const octokit = github.getOctokit(
-    /** @type string */ (process.env.GITHUB_TOKEN)
-  );
-  const {
-    repo: { owner, repo },
-  } = github.context;
-
-  const releaseId = parseInt(core.getInput('release_id'), 10);
-  core.info(`Fetching metadata for release ${releaseId}`);
-  const release = await octokit.rest.repos.getRelease({
-    owner,
-    repo,
-    release_id: releaseId,
-  });
-
-  // Look for the add-on asset in the release's assets
-  const addonAssetName = core.getInput('addon_asset_name');
-  const addonAsset = release.data.assets.find((a) => a.name === addonAssetName);
-  if (!addonAsset) {
-    throw new Error(`No asset found with name ${addonAssetName}`);
-  }
-  core.info(`Found add-on asset: ${addonAsset.name}`);
-
-  // Fetch the asset
+  // Look for the add-on asset
   const workspace = /** @type string */ (process.env.GITHUB_WORKSPACE);
-  const assetPath = path.join(workspace, 'addon.zip');
-  core.info(`Downloading ${addonAsset.browser_download_url} to ${assetPath}`);
-  await pipeline(
-    await getHttpsStream(addonAsset.browser_download_url),
-    fs.createWriteStream(assetPath)
-  );
+  const addonFile = path.join(workspace, core.getInput('addon_file'));
+  if (!fs.existsSync(addonFile)) {
+    throw new Error(`Asset file not found ${addonFile}`);
+  }
+  core.info(`Found add-on file: ${addonFile}`);
 
-  // Upload the asset
+  // Validate the source asset, if any
+  let srcFile = core.getInput('src_asset_name');
+  if (srcFile?.length) {
+    srcFile = path.join(workspace, srcFile);
+    if (!fs.existsSync(srcFile)) {
+      throw new Error(`Source file not found ${srcFile}`);
+    }
+    core.info(`Found source file: ${srcFile}`);
+  }
+
+  // Upload the add-on asset
   const formData = new FormData();
-  formData.append('upload', fs.createReadStream(assetPath));
+  formData.append('upload', fs.createReadStream(addonFile));
   formData.append('channel', 'listed');
   const uploadResponse = await uploadToAmo({
     path: '/api/v5/addons/upload/',
@@ -148,10 +131,10 @@ async function main() {
   const addonId = core.getInput('addon_id');
   // TODO: Support a release_notes_json parameter that allows specifying a JSON
   // string with all the localized release notes.
-  const releaseNotes = core.getInput('release_notes') || release.data.body;
+  const releaseNotes = core.getInput('release_notes');
   const postData = JSON.stringify({
     compatibility: ['android', 'firefox'],
-    release_notes: { 'en-US': releaseNotes },
+    release_notes: releaseNotes ? { 'en-US': releaseNotes } : null,
     upload: uuid,
   });
   /** @type VersionDetail */
@@ -163,28 +146,10 @@ async function main() {
   );
   core.info(`Successfully created version ${versionString} (id: ${versionId})`);
 
-  // Get the source asset (if any)
-  const srcAssetName = core.getInput('src_asset_name');
-  if (srcAssetName) {
-    const srcAsset = release.data.assets.find((a) => a.name === srcAssetName);
-    if (!srcAsset) {
-      throw new Error(`No asset found with name ${srcAssetName}`);
-    }
-    core.info(`Found source asset: ${srcAsset.name}`);
-
-    // Download the source asset
-    const srcAssetPath = path.join(workspace, 'addon-src.zip');
-    core.info(
-      `Downloading ${srcAsset.browser_download_url} to ${srcAssetPath}`
-    );
-    await pipeline(
-      await getHttpsStream(srcAsset.browser_download_url),
-      fs.createWriteStream(srcAssetPath)
-    );
-
-    // Upload the source asset
+  // Upload the source file (if any)
+  if (srcFile?.length) {
     const form = new FormData();
-    form.append('source', fs.createReadStream(srcAssetPath));
+    form.append('source', fs.createReadStream(srcFile));
     uploadToAmo({
       path: `/api/v5/addons/addon/${addonId}/versions/${versionId}/`,
       formData: form,
@@ -199,32 +164,6 @@ async function main() {
 main().catch((error) => {
   core.setFailed(error.message);
 });
-
-/**
- * @param {string} url
- * @returns {Promise<Readable>}
- */
-async function getHttpsStream(url) {
-  const res = await fetch(url);
-  if (!res.ok) {
-    throw new Error(
-      `Got status ${res.status} (${res.statusText}) for GET ${url}`
-    );
-  }
-
-  if (!res.body) {
-    throw new Error('Response has no body');
-  }
-
-  // See:
-  //
-  // https://stackoverflow.com/questions/63630114/argument-of-type-readablestreamany-is-not-assignable-to-parameter-of-type-r
-  // https://stackoverflow.com/questions/73308289/typescript-error-converting-a-native-fetch-body-webstream-to-a-node-stream
-  // for why the cast is necessary
-  return Readable.fromWeb(
-    /** @type import('stream/web').ReadableStream<any> */ (res.body)
-  );
-}
 
 const AMO_HOST = 'addons.mozilla.org';
 
