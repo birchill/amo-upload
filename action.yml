@@ -1,5 +1,8 @@
 name: 'Upload to AMO'
 description: 'Publishes an updated version of a Web Extension on addons.mozilla.org'
+branding:
+  icon: 'upload-cloud'
+  color: 'orange'
 inputs:
   amo_jwt_iss:
     description: The JWT issuer (also refered to as the API key) from https://addons.mozilla.org/en-US/developers/addon/api/key/
