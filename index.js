@@ -59,7 +59,10 @@ import utf8 from 'utf8';
 async function main() {
   // Look for the add-on asset
   const workspace = /** @type string */ (process.env.GITHUB_WORKSPACE);
-  const addonFile = path.join(workspace, core.getInput('addon_file'));
+  const addonFile = path.join(
+    workspace,
+    core.getInput('addon_file', { required: true })
+  );
   if (!fs.existsSync(addonFile)) {
     throw new Error(`Asset file not found ${addonFile}`);
   }
@@ -128,7 +131,7 @@ async function main() {
   }
 
   // Create a new version with the provided release notes
-  const addonId = core.getInput('addon_id');
+  const addonId = core.getInput('addon_id', { required: true });
   // TODO: Support a release_notes_json parameter that allows specifying a JSON
   // string with all the localized release notes.
   const releaseNotes = core.getInput('release_notes');
@@ -255,8 +258,8 @@ function uploadToAmo({ path, formData, method = 'POST' }) {
 }
 
 function getJwtToken() {
-  const jwtIss = core.getInput('amo_jwt_iss');
-  const jwtSecret = core.getInput('amo_jwt_secret');
+  const jwtIss = core.getInput('amo_jwt_iss', { required: true });
+  const jwtSecret = core.getInput('amo_jwt_secret', { required: true });
   const issuedAt = Math.floor(Date.now() / 1000);
   const payload = {
     iss: jwtIss,

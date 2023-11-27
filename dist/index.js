@@ -16179,7 +16179,10 @@ async function main() {
     /** @type string */
     process.env.GITHUB_WORKSPACE
   );
-  const addonFile = path.join(workspace, core.getInput("addon_file"));
+  const addonFile = path.join(
+    workspace,
+    core.getInput("addon_file", { required: true })
+  );
   if (!fs.existsSync(addonFile)) {
     throw new Error(`Asset file not found ${addonFile}`);
   }
@@ -16230,7 +16233,7 @@ async function main() {
   } finally {
     clearTimeout(tenMinuteTimeout);
   }
-  const addonId = core.getInput("addon_id");
+  const addonId = core.getInput("addon_id", { required: true });
   const releaseNotes = core.getInput("release_notes");
   const postData = JSON.stringify({
     compatibility: ["android", "firefox"],
@@ -16324,8 +16327,8 @@ function uploadToAmo({ path: path2, formData, method = "POST" }) {
   });
 }
 function getJwtToken() {
-  const jwtIss = core.getInput("amo_jwt_iss");
-  const jwtSecret = core.getInput("amo_jwt_secret");
+  const jwtIss = core.getInput("amo_jwt_iss", { required: true });
+  const jwtSecret = core.getInput("amo_jwt_secret", { required: true });
   const issuedAt = Math.floor(Date.now() / 1e3);
   const payload = {
     iss: jwtIss,
