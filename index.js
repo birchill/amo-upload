@@ -7,6 +7,8 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import utf8 from 'utf8';
 
+const AMO_HOST = 'addons.mozilla.org';
+
 /**
  * @typedef {object} UploadDetail
  * @property {string} uuid
@@ -168,8 +170,6 @@ main().catch((error) => {
   core.error(error);
   core.setFailed(error.message);
 });
-
-const AMO_HOST = 'addons.mozilla.org';
 
 /**
  * @param {string} path

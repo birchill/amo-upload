@@ -16174,6 +16174,7 @@ var import_jsonwebtoken = __toESM(require_jsonwebtoken(), 1);
 var import_utf8 = __toESM(require_utf8(), 1);
 import * as fs from "node:fs";
 import * as path from "node:path";
+var AMO_HOST = "addons.mozilla.org";
 async function main() {
   const workspace = (
     /** @type string */
@@ -16188,7 +16189,7 @@ async function main() {
   }
   core.info(`Found add-on file: ${addonFile}`);
   let srcFile = core.getInput("src_file");
-  if (srcFile == null ? void 0 : srcFile.length) {
+  if (srcFile?.length) {
     srcFile = path.join(workspace, srcFile);
     if (!fs.existsSync(srcFile)) {
       throw new Error(`Source file not found ${srcFile}`);
@@ -16247,7 +16248,7 @@ async function main() {
     })
   );
   core.info(`Successfully created version ${versionString} (id: ${versionId})`);
-  if (srcFile == null ? void 0 : srcFile.length) {
+  if (srcFile?.length) {
     const form = new import_form_data.default();
     form.append("source", fs.createReadStream(srcFile));
     uploadToAmo({
@@ -16263,7 +16264,6 @@ main().catch((error2) => {
   core.error(error2);
   core.setFailed(error2.message);
 });
-var AMO_HOST = "addons.mozilla.org";
 async function getFromAmo(path2) {
   const url = `https://${AMO_HOST}${path2}`;
   const res = await fetch(url, {
