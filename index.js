@@ -66,7 +66,7 @@ async function main() {
   core.info(`Found add-on file: ${addonFile}`);
 
   // Validate the source asset, if any
-  let srcFile = core.getInput('src_asset_name');
+  let srcFile = core.getInput('src_file');
   if (srcFile?.length) {
     srcFile = path.join(workspace, srcFile);
     if (!fs.existsSync(srcFile)) {
@@ -162,6 +162,7 @@ async function main() {
 }
 
 main().catch((error) => {
+  core.error(error);
   core.setFailed(error.message);
 });
 
@@ -215,6 +216,7 @@ async function postToAmo({ path, jsonData }) {
  * @returns {Promise<string>}
  */
 function uploadToAmo({ path, formData, method = 'POST' }) {
+  core.info(`Uploading to https://${AMO_HOST}${path} (${method})`);
   return new Promise((resolve, reject) => {
     formData.submit(
       {
