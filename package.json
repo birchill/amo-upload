@@ -19,7 +19,7 @@
     "@types/node": "20.11.6",
     "@types/utf8": "3.0.3",
     "esbuild": "0.19.12",
-    "husky": "9.0.5",
+    "husky": "9.0.6",
     "prettier": "3.2.4",
     "typescript": "5.3.3"
   },
@@ -29,6 +29,6 @@
     "format-check": "prettier --check index.js",
     "package": "esbuild index.js --outfile=dist/index.js --bundle --platform=node --target=node20 --format=esm --banner:js=\"import {createRequire} from 'module'; const require=createRequire(import.meta.url);\"",
     "all": "yarn build && yarn format && yarn package",
-    "postinstall": "husky install"
+    "postinstall": "husky"
   }
 }
