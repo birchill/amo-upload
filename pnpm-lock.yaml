@@ -25,8 +25,8 @@ importers:
         specifier: 9.0.7
         version: 9.0.7
       '@types/node':
-        specifier: 20.17.14
-        version: 20.17.14
+        specifier: 20.17.16
+        version: 20.17.16
       '@types/utf8':
         specifier: 3.0.3
         version: 3.0.3
@@ -214,8 +214,8 @@ packages:
   '@types/jsonwebtoken@9.0.7':
     resolution: {integrity: sha512-ugo316mmTYBl2g81zDFnZ7cfxlut3o+/EQdaP7J8QN2kY6lJ22hmQYCK5EHcJHbrW+dkCGSCPgbG8JtYj6qSrg==}
 
-  '@types/node@20.17.14':
-    resolution: {integrity: sha512-w6qdYetNL5KRBiSClK/KWai+2IMEJuAj+EujKCumalFOwXtvOXaEan9AuwcRID2IcOIAWSIfR495hBtgKlx2zg==}
+  '@types/node@20.17.16':
+    resolution: {integrity: sha512-vOTpLduLkZXePLxHiHsBLp98mHGnl8RptV4YAO3HfKO5UHjDvySGbxKtpYfy8Sx5+WKcgc45qNreJJRVM3L6mw==}
 
   '@types/utf8@3.0.3':
     resolution: {integrity: sha512-+lqLGxWZsEe4Z6OrzBI7Ym4SMUTaMS5yOrHZ0/IL0bpIye1Qbs4PpobJL2mLDbftUXlPFZR7fu6d1yM+bHLX1w==}
@@ -422,9 +422,9 @@ snapshots:
 
   '@types/jsonwebtoken@9.0.7':
     dependencies:
-      '@types/node': 20.17.14
+      '@types/node': 20.17.16
 
-  '@types/node@20.17.14':
+  '@types/node@20.17.16':
     dependencies:
       undici-types: 6.19.8
 
