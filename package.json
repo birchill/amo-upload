@@ -16,7 +16,7 @@
   },
   "devDependencies": {
     "@types/jsonwebtoken": "9.0.9",
-    "@types/node": "20.17.50",
+    "@types/node": "20.17.51",
     "@types/utf8": "3.0.3",
     "esbuild": "0.25.4",
     "husky": "9.1.7",
