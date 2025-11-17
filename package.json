@@ -10,7 +10,7 @@
   "type": "module",
   "dependencies": {
     "@actions/core": "1.11.1",
-    "form-data": "4.0.4",
+    "form-data": "4.0.5",
     "jsonwebtoken": "9.0.2",
     "utf8": "3.0.0"
   },
