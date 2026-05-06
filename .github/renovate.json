@@ -1,6 +1,7 @@
 {
   "extends": ["config:recommended", ":dependencyDashboard"],
   "labels": ["dependencies"],
+  "minimumReleaseAge": "1 day",
   "packageRules": [
     {
       "matchUpdateTypes": ["minor", "patch"],

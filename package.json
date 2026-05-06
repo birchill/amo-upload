@@ -8,6 +8,9 @@
   "author": "Brian Birtles <birtles@gmail.com>",
   "license": "MIT",
   "type": "module",
+  "engines": {
+    "pnpm": ">=11"
+  },
   "dependencies": {
     "@actions/core": "3.0.1",
     "form-data": "4.0.5",
