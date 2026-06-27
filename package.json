@@ -23,7 +23,7 @@
     "@types/utf8": "3.0.3",
     "esbuild": "0.28.1",
     "husky": "9.1.7",
-    "prettier": "3.8.4",
+    "prettier": "3.8.5",
     "typescript": "6.0.3"
   },
   "scripts": {
